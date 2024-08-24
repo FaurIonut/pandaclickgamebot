@@ -1,9 +1,8 @@
-import { Telegraf } from "telegraf";
-import TelegramBot, { CallbackQuery } from "node-telegram-bot-api";
-import dotenv from "dotenv";
-import axios from "axios";
-import express from "express";
-import cors from "cors";
+import { Telegraf, Markup, Context } from "telegraf";
+import express from 'express';
+import dotenv from 'dotenv';
+import axios from 'axios';
+import cors from 'cors';
 
 // Load environment variables
 dotenv.config();
@@ -117,8 +116,7 @@ bot.on('message', async (ctx) => {
 
 // Handle callback queries from inline buttons
 bot.on('callback_query', (ctx) => {
-  const callbackQuery: CallbackQuery = ctx.callbackQuery;
-  const category = callbackQuery.data;
+  const category = ctx.callbackQuery.data;
 
   if (category === "earn") {
     const messagetext =
