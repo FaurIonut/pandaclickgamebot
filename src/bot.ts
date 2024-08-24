@@ -1,4 +1,4 @@
-import { Telegraf, Markup } from "telegraf";
+import { Telegraf, Markup } from 'telegraf';
 import express from 'express';
 import dotenv from 'dotenv';
 import axios from 'axios';
@@ -7,8 +7,8 @@ import cors from 'cors';
 // Load environment variables
 dotenv.config();
 
-const token = process.env.TELEGRAM_TOKEN;
-const url = process.env.WEBHOOK_URL; // Your Render URL
+const token = process.env.TELEGRAM_TOKEN!;
+const url = process.env.WEBHOOK_URL!; // Your Render URL
 console.log("Bot token:", token); // Confirm token is loaded
 
 // Create a new Telegram bot
@@ -20,33 +20,33 @@ app.use(cors());
 app.use(express.json());
 
 // Assign telegram channel id
-const groupUsername = process.env.GROUP_USERNAME;
-const channelUsername = process.env.CHANNEL_USERNAME;
-const twitter = process.env.TWITTER_ID;
+const groupUsername = process.env.GROUP_USERNAME!;
+const channelUsername = process.env.CHANNEL_USERNAME!;
+const twitter = process.env.TWITTER_ID!;
 
 let groupId: number = 0;
 let channelID: number = 0;
 let twitterID: number = 0;
 
 let USER_ID: number = 0;
-let USER_NAME: string = "Leo_mint";
+let USER_NAME: string = 'Leo_mint';
 let chatId: number = 0;
 
 bot.telegram.getChat(groupUsername)
-  .then((chat: any) => {
+  .then((chat) => {
     groupId = chat.id;
     console.log("Group ID:", groupId);
   })
-  .catch((error: any) => {
+  .catch((error) => {
     console.error("Error getting chat:", error);
   });
 
 bot.telegram.getChat(channelUsername)
-  .then((chat: any) => {
+  .then((chat) => {
     channelID = chat.id;
-    console.log("channel ID:", channelID);
+    console.log("Channel ID:", channelID);
   })
-  .catch((error: any) => {
+  .catch((error) => {
     console.error("Error getting chat:", error);
   });
 
@@ -79,7 +79,11 @@ bot.command('start', (ctx) => {
   console.log("--//---myChatID----//---", chatId);
 
   const welcomeMessage =
-    "Hello! Welcome to the Mike Mystery Bot 🐉 🐸 🐲                  \n\nStart our tap-to-earn game by clicking the "Play" button below. Choose your adventure and start tapping the screen to collect coins.   \n\nBoost your passive income and develop your own strategy with multi-taps, higher energy, and referrals. Join our social media to become an active member of the CryptoMonsters society with the exclusive "Mike Token." \n\nIn Mystery Bot, all activities are rewarded. Gather as many coins as possible. Once $MKT is listed on T1 & T2 exchanges, you'll receive mysterious, valuable prizes directly to your wallets.\n\nDon't forget to invite your friends — you can earn even more together!";
+    "Hello! Welcome to the Mike Mystery Bot 🐉 🐸 🐲\n\n" +
+    "Start our tap-to-earn game by clicking the 'Play' button below. Choose your adventure and start tapping the screen to collect coins.\n\n" +
+    "Boost your passive income and develop your own strategy with multi-taps, higher energy, and referrals. Join our social media to become an active member of the CryptoMonsters society with the exclusive 'Mike Token.'\n\n" +
+    "In Mystery Bot, all activities are rewarded. Gather as many coins as possible. Once $MKT is listed on T1 & T2 exchanges, you'll receive mysterious, valuable prizes directly to your wallets.\n\n" +
+    "Don't forget to invite your friends — you can earn even more together!";
 
   // Send the welcome message with the inline keyboard
   ctx.reply(welcomeMessage, options);
@@ -89,7 +93,7 @@ bot.on('message', async (ctx) => {
   chatId = ctx.chat.id;
   USER_ID = chatId;
   const userID = ctx.from.id;
-  USER_NAME = ctx.from?.username;
+  USER_NAME = ctx.from?.username || '';
 
   console.log("--//---myChatID----//---", chatId);
   console.log("--//---myUserID----//---", userID);
@@ -102,7 +106,7 @@ bot.on('message', async (ctx) => {
 
     try {
       await axios.post(
-        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/vibe/add`,
+        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/vibe/add',
         {
           username: ctx.from.username,
         }
@@ -121,7 +125,24 @@ bot.on('callback_query', (ctx) => {
 
   if (category === "earn") {
     const messagetext =
-      "How to play Monster Mystery Bot⚡️                              \n\n 💰 Tap to Earn \n\nTap the screen and collect coins. These coins will be exchanged to $MKT at the end of the event.  \n\n  ⛏ Mine\n\nUpgrade your status by buying special NFTs that will give you higher passive income opportunities (coming soon).  \n\n ⏰ Profit Per Hour \n\nThe bot itself as well as your status will work for you and mine more coins while you are away!  \n\nNote: You need to log in to the game again once in a while. \n\n  👥 Friends & Family \n\nInvite your friends and family and you will get bonuses. Help a friend move to the higher levels and you will get even more bonuses. \n\n⏳ Token Listings (top 10 exchanges only) \n\nAt the end of the event, $MKT tokens will be airdropped and distributed among the players. MKT is already transferable and tradable. You can buy, sell or stake in our website to earn even more! You can buy Mike Token ($MKT) at the below exchanges right now: \n\nhttps://pancakeswap.finance/swap?outputCurrency=0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\nhttps://m.indoex.io/orderbookmobile/MKT_USDT \n\n📑 MKT Contract Address:\n\n0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\nThe exact date of T1 & T2 Exchange listings will be announced in our announcement channel.\n\nHave fun and enjoy earning! 💰💰";
+      "How to play Monster Mystery Bot⚡️\n\n" +
+      "💰 Tap to Earn\n\n" +
+      "Tap the screen and collect coins. These coins will be exchanged to $MKT at the end of the event.\n\n" +
+      "⛏ Mine\n\n" +
+      "Upgrade your status by buying special NFTs that will give you higher passive income opportunities (coming soon).\n\n" +
+      "⏰ Profit Per Hour\n\n" +
+      "The bot itself as well as your status will work for you and mine more coins while you are away!\n\n" +
+      "Note: You need to log in to the game again once in a while.\n\n" +
+      "👥 Friends & Family\n\n" +
+      "Invite your friends and family and you will get bonuses. Help a friend move to the higher levels and you will get even more bonuses.\n\n" +
+      "⏳ Token Listings (top 10 exchanges only)\n\n" +
+      "At the end of the event, $MKT tokens will be airdropped and distributed among the players. MKT is already transferable and tradable. You can buy, sell or stake in our website to earn even more! You can buy Mike Token ($MKT) at the below exchanges right now:\n\n" +
+      "https://pancakeswap.finance/swap?outputCurrency=0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\n" +
+      "https://m.indoex.io/orderbookmobile/MKT_USDT\n\n" +
+      "📑 MKT Contract Address:\n\n" +
+      "0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\n" +
+      "The exact date of T1 & T2 Exchange listings will be announced in our announcement channel.\n\n" +
+      "Have fun and enjoy earning! 💰💰";
 
     ctx.answerCbQuery();
     ctx.reply(messagetext, options3);
@@ -129,8 +150,17 @@ bot.on('callback_query', (ctx) => {
 
   if (category === "task") {
     const messagetext =
-      "   😊   You will gain bonus!  🚀                    \n\n 😎  Join Mike's telegram group  \n       https://t.me/MikeToken \n       You will receive 1000 coins \n\n 🤩  Join Mike's Ann Channel  \n       https://t.me/MikeTokenAnn \n       You will receive 1000 coins \n\n  😍  Follow our twitter!\n       https://twitter.com/MikeTokenio\n       You will receive 1000 coins \n\n";
-    
+      "😊 You will gain bonus! 🚀\n\n" +
+      "😎 Join Mike's telegram group\n" +
+      "https://t.me/MikeToken\n" +
+      "You will receive 1000 coins\n\n" +
+      "🤩 Join Mike's Ann Channel\n" +
+      "https://t.me/MikeTokenAnn\n" +
+      "You will receive 1000 coins\n\n" +
+      "😍 Follow our twitter!\n" +
+      "https://twitter.com/MikeTokenio\n" +
+      "You will receive 1000 coins\n\n";
+
     ctx.answerCbQuery();
     ctx.reply(messagetext, options);
   }
@@ -140,7 +170,7 @@ bot.command('start', async (ctx) => {
   const startPayload = ctx.message.text.split(' ')[1];
   if (startPayload) {
     const referrerUsername = startPayload;
-    const username = ctx.from.username;
+    const username = ctx.from.username || '';
 
     console.log("--//---OK!!!----//---");
     console.log("--//---referrerUsername----//---", referrerUsername);
@@ -148,7 +178,7 @@ bot.command('start', async (ctx) => {
 
     try {
       await axios.post(
-        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/friend/add`,
+        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/friend/add',
         {
           username: referrerUsername,
           friend: username,
@@ -156,7 +186,7 @@ bot.command('start', async (ctx) => {
       );
 
       const response00 = await axios.post(
-        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/wallet/add`,
+        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/wallet/add',
         {
           username: username,
         }
@@ -193,7 +223,7 @@ app.post("/joinTG", async (req, res) => {
     if (member.status !== "left" && member.status !== "kicked") {
       console.log("💪 You will gain 1000 coins!");
       await axios.post(
-        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add`,
+        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add',
         { username: username }
       );
       await axios.post(
@@ -220,7 +250,7 @@ app.post("/joinTC", async (req, res) => {
     if (member.status !== "left" && member.status !== "kicked") {
       console.log("💪 You will gain 1000 coins!");
       await axios.post(
-        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add`,
+        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add',
         { username: username }
       );
       await axios.post(
@@ -229,7 +259,7 @@ app.post("/joinTC", async (req, res) => {
       );
       res.status(200).json({ message: "ok", username: username });
     } else {
-      res.status(400).json({ message: "you are not in group now", username: username });
+      res.status(400).json({ message: "you are not in channel now", username: username });
     }
   } catch (error) {
     console.error("Error checking chat member:", error);
