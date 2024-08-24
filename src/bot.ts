@@ -94,6 +94,28 @@ bot.onText(/\/start/, (msg: any) => {
   bot.sendMessage(chatId, welcomeMessage, options);
 });
 
+// Handle the /start (referrer) command
+bot.onText(/\/start (.+)/, async (msg: any, match: any) => {
+  const chatId = msg.chat.id;
+  const referrerUsername = match[1];
+  try {
+    await axios.post(`https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/friend/add`, {
+      username: referrerUsername,
+      friend: USER_NAME,
+    });
+    await axios.post(`https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/wallet/add`, {
+      username: USER_NAME,
+    });
+    await axios.post(`https://mike-token-backend-1.onrender.com/api/wallet/updateBalance/${USER_NAME}`, { balance: 200 });
+    const response1 = await axios.post(`https://mike-token-backend-1.onrender.com/api/wallet/${referrerUsername}`);
+    await axios.post(`https://mike-token-backend-1.onrender.com/api/wallet/updateBalance/${referrerUsername}`, {
+      balance: 200 + response1.data.balance,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 bot.on("message", async (msg: any) => {
   const chatId = msg.chat.id;
   USER_ID = chatId;
@@ -131,31 +153,11 @@ bot.on("callback_query", (callbackQuery: CallbackQuery) => {
   }
 });
 
-bot.onText(/\/start (.+)/, async (msg: any, match: any) => {
-  const chatId = msg.chat.id;
-  const referrerUsername = match[1];
-  try {
-    await axios.post(`https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/friend/add`, {
-      username: referrerUsername,
-      friend: USER_NAME,
-    });
-    await axios.post(`https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/wallet/add`, {
-      username: USER_NAME,
-    });
-    await axios.post(`https://mike-token-backend-1.onrender.com/api/wallet/updateBalance/${USER_NAME}`, { balance: 200 });
-    const response1 = await axios.post(`https://mike-token-backend-1.onrender.com/api/wallet/${referrerUsername}`);
-    await axios.post(`https://mike-token-backend-1.onrender.com/api/wallet/updateBalance/${referrerUsername}`, {
-      balance: 200 + response1.data.balance,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-});
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Handle /joinTG endpoint
 app.post("/joinTG", (req: any, res: any) => {
   const username = req.body["username"];
   if (groupId === undefined) {
@@ -186,6 +188,7 @@ app.post("/joinTG", (req: any, res: any) => {
     });
 });
 
+// Handle /joinTC endpoint
 app.post("/joinTC", (req: any, res: any) => {
   const username = req.body["username"];
   if (channelID === undefined) {
