@@ -30,6 +30,7 @@ const twitter = process.env.TWITTER_ID || ''; // Unused
 
 let groupId: number = 0;
 let channelID: number = 0;
+let USER_ID: number | undefined; // Ensure USER_ID is defined
 
 // Initialize groupId and channelID
 bot.telegram.getChat(groupUsername)
@@ -73,7 +74,10 @@ const options3 = Markup.inlineKeyboard([
 
 // Handle the /start command
 bot.command('start', (ctx: Context) => {
+    const chatId = ctx.chat?.id; // Check if ctx.chat is defined
     const userID = ctx.from?.id;
+
+    if (!chatId || !userID) return; // Ensure chatId and userID are defined
 
     const welcomeMessage =
         "Hello! Welcome to the Mike Mystery Bot 🐉 🐸 🐲\n\n" +
@@ -87,11 +91,10 @@ bot.command('start', (ctx: Context) => {
 });
 
 bot.on('message', async (ctx: Context) => {
-    const chatId = ctx.chat.id;
+    const chatId = ctx.chat?.id;
     const userID = ctx.from?.id;
 
-    // Check if the message is from the specific group and the specific user
-    if (chatId === groupId && userID) {
+    if (chatId === groupId && userID !== undefined) {
         // Process the message
         ctx.reply(`User ${ctx.from?.username} posted a message in the group.`);
 
@@ -108,11 +111,11 @@ bot.on('message', async (ctx: Context) => {
 
 // Handle callback queries from inline buttons
 bot.on('callback_query', async (ctx: Context) => {
-    const category = ctx.callbackQuery?.data;
+    const callbackData = ctx.callbackQuery?.data;
 
-    if (!category) return; // Early return if data is undefined
+    if (!callbackData) return; // Early return if data is undefined
 
-    if (category === 'earn') {
+    if (callbackData === 'earn') {
         const messagetext =
             "How to play Monster Mystery Bot⚡️\n\n" +
             "💰 Tap to Earn\n\n" +
@@ -135,7 +138,7 @@ bot.on('callback_query', async (ctx: Context) => {
 
         await ctx.answerCbQuery();
         await ctx.reply(messagetext, options3);
-    } else if (category === 'task') {
+    } else if (callbackData === 'task') {
         const messagetext =
             "😊 You will gain bonus! 🚀\n\n" +
             "😎 Join Mike's telegram group\n" +
@@ -220,3 +223,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
