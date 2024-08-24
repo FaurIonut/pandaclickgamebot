@@ -116,6 +116,7 @@ bot.on('message', async (ctx) => {
 
 // Handle callback queries from inline buttons
 bot.on('callback_query', (ctx) => {
+  if (!ctx.callbackQuery.data) return; // Early return if data is undefined
   const category = ctx.callbackQuery.data;
 
   if (category === "earn") {
