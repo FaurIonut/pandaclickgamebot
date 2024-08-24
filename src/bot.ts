@@ -1,4 +1,4 @@
-import { Telegraf, Markup } from 'telegraf';
+import { Telegraf, Markup } from "telegraf";
 import express from 'express';
 import dotenv from 'dotenv';
 import axios from 'axios';
@@ -7,8 +7,8 @@ import cors from 'cors';
 // Load environment variables
 dotenv.config();
 
-const token = process.env.TELEGRAM_TOKEN!;
-const url = process.env.WEBHOOK_URL!; // Your Render URL
+const token = process.env.TELEGRAM_TOKEN;
+const url = process.env.WEBHOOK_URL; // Your Render URL
 console.log("Bot token:", token); // Confirm token is loaded
 
 // Create a new Telegram bot
@@ -20,33 +20,33 @@ app.use(cors());
 app.use(express.json());
 
 // Assign telegram channel id
-const groupUsername = process.env.GROUP_USERNAME!;
-const channelUsername = process.env.CHANNEL_USERNAME!;
-const twitter = process.env.TWITTER_ID!;
+const groupUsername = process.env.GROUP_USERNAME;
+const channelUsername = process.env.CHANNEL_USERNAME;
+const twitter = process.env.TWITTER_ID;
 
 let groupId: number = 0;
 let channelID: number = 0;
 let twitterID: number = 0;
 
 let USER_ID: number = 0;
-let USER_NAME: string = 'Leo_mint';
+let USER_NAME: string = "Leo_mint";
 let chatId: number = 0;
 
 bot.telegram.getChat(groupUsername)
-  .then((chat) => {
+  .then((chat: any) => {
     groupId = chat.id;
     console.log("Group ID:", groupId);
   })
-  .catch((error) => {
+  .catch((error: any) => {
     console.error("Error getting chat:", error);
   });
 
 bot.telegram.getChat(channelUsername)
-  .then((chat) => {
+  .then((chat: any) => {
     channelID = chat.id;
     console.log("Channel ID:", channelID);
   })
-  .catch((error) => {
+  .catch((error: any) => {
     console.error("Error getting chat:", error);
   });
 
@@ -93,7 +93,7 @@ bot.on('message', async (ctx) => {
   chatId = ctx.chat.id;
   USER_ID = chatId;
   const userID = ctx.from.id;
-  USER_NAME = ctx.from?.username || '';
+  USER_NAME = ctx.from?.username;
 
   console.log("--//---myChatID----//---", chatId);
   console.log("--//---myUserID----//---", userID);
@@ -106,7 +106,7 @@ bot.on('message', async (ctx) => {
 
     try {
       await axios.post(
-        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/vibe/add',
+        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/vibe/add`,
         {
           username: ctx.from.username,
         }
@@ -121,7 +121,9 @@ bot.on('message', async (ctx) => {
 
 // Handle callback queries from inline buttons
 bot.on('callback_query', (ctx) => {
-  const category = ctx.callbackQuery.data;
+  // Type assertion to make TypeScript recognize `data` property
+  const callbackQuery = ctx.callbackQuery as Telegraf.CallbackQuery;
+  const category = callbackQuery.data; // `data` is now recognized on `CallbackQuery`
 
   if (category === "earn") {
     const messagetext =
@@ -146,9 +148,7 @@ bot.on('callback_query', (ctx) => {
 
     ctx.answerCbQuery();
     ctx.reply(messagetext, options3);
-  }
-
-  if (category === "task") {
+  } else if (category === "task") {
     const messagetext =
       "😊 You will gain bonus! 🚀\n\n" +
       "😎 Join Mike's telegram group\n" +
@@ -170,7 +170,7 @@ bot.command('start', async (ctx) => {
   const startPayload = ctx.message.text.split(' ')[1];
   if (startPayload) {
     const referrerUsername = startPayload;
-    const username = ctx.from.username || '';
+    const username = ctx.from.username;
 
     console.log("--//---OK!!!----//---");
     console.log("--//---referrerUsername----//---", referrerUsername);
@@ -178,7 +178,7 @@ bot.command('start', async (ctx) => {
 
     try {
       await axios.post(
-        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/friend/add',
+        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/friend/add`,
         {
           username: referrerUsername,
           friend: username,
@@ -186,7 +186,7 @@ bot.command('start', async (ctx) => {
       );
 
       const response00 = await axios.post(
-        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/wallet/add',
+        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/wallet/add`,
         {
           username: username,
         }
@@ -223,7 +223,7 @@ app.post("/joinTG", async (req, res) => {
     if (member.status !== "left" && member.status !== "kicked") {
       console.log("💪 You will gain 1000 coins!");
       await axios.post(
-        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add',
+        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add`,
         { username: username }
       );
       await axios.post(
@@ -250,7 +250,7 @@ app.post("/joinTC", async (req, res) => {
     if (member.status !== "left" && member.status !== "kicked") {
       console.log("💪 You will gain 1000 coins!");
       await axios.post(
-        'https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add',
+        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add`,
         { username: username }
       );
       await axios.post(
