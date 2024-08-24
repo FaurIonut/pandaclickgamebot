@@ -1,4 +1,4 @@
-import { Telegraf, Markup } from "telegraf";
+import { Telegraf, Markup, Context as TelegrafContext } from "telegraf";
 import express from 'express';
 import dotenv from 'dotenv';
 import axios from 'axios';
@@ -11,6 +11,11 @@ const token = process.env.TELEGRAM_TOKEN;
 const url = process.env.WEBHOOK_URL; // Your Render URL
 console.log("Bot token:", token); // Confirm token is loaded
 
+// Check that token and URL are defined
+if (!token || !url) {
+    throw new Error("Missing TELEGRAM_TOKEN or WEBHOOK_URL environment variable.");
+}
+
 // Create a new Telegram bot
 const bot = new Telegraf(token);
 
@@ -20,13 +25,12 @@ app.use(cors());
 app.use(express.json());
 
 // Assign telegram channel id
-const groupUsername = process.env.GROUP_USERNAME;
-const channelUsername = process.env.CHANNEL_USERNAME;
-const twitter = process.env.TWITTER_ID;
+const groupUsername = process.env.GROUP_USERNAME || '';
+const channelUsername = process.env.CHANNEL_USERNAME || '';
+const twitter = process.env.TWITTER_ID || '';
 
 let groupId: number = 0;
 let channelID: number = 0;
-let twitterID: number = 0;
 
 let USER_ID: number = 0;
 let USER_NAME: string = "Leo_mint";
@@ -93,7 +97,7 @@ bot.on('message', async (ctx) => {
   chatId = ctx.chat.id;
   USER_ID = chatId;
   const userID = ctx.from.id;
-  USER_NAME = ctx.from?.username;
+  USER_NAME = ctx.from?.username || "Unknown";
 
   console.log("--//---myChatID----//---", chatId);
   console.log("--//---myUserID----//---", userID);
@@ -121,9 +125,8 @@ bot.on('message', async (ctx) => {
 
 // Handle callback queries from inline buttons
 bot.on('callback_query', (ctx) => {
-  // Type assertion to make TypeScript recognize `data` property
-  const callbackQuery = ctx.callbackQuery as Telegraf.CallbackQuery;
-  const category = callbackQuery.data; // `data` is now recognized on `CallbackQuery`
+  const callbackQuery = ctx.callbackQuery;
+  const category = callbackQuery.data;
 
   if (category === "earn") {
     const messagetext =
@@ -157,67 +160,27 @@ bot.on('callback_query', (ctx) => {
       "🤩 Join Mike's Ann Channel\n" +
       "https://t.me/MikeTokenAnn\n" +
       "You will receive 1000 coins\n\n" +
-      "😍 Follow our twitter!\n" +
-      "https://twitter.com/MikeTokenio\n" +
-      "You will receive 1000 coins\n\n";
+      "😎 Follow Mike's Twitter\n" +
+      "https://twitter.com/MikeToken\n" +
+      "You will receive 1000 coins\n\n" +
+      "All tasks are verified by the bot. If you completed these tasks you will receive coins to your wallet. Please wait for a while and the bot will process your request. After you complete the tasks, your coins will be sent to your account!";
 
     ctx.answerCbQuery();
-    ctx.reply(messagetext, options);
+    ctx.reply(messagetext, option1);
   }
 });
 
-bot.command('start', async (ctx) => {
-  const startPayload = ctx.message.text.split(' ')[1];
-  if (startPayload) {
-    const referrerUsername = startPayload;
-    const username = ctx.from.username;
-
-    console.log("--//---OK!!!----//---");
-    console.log("--//---referrerUsername----//---", referrerUsername);
-    console.log("--//---USER_NAME----//---", username);
-
-    try {
-      await axios.post(
-        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/friend/add`,
-        {
-          username: referrerUsername,
-          friend: username,
-        }
-      );
-
-      const response00 = await axios.post(
-        `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/wallet/add`,
-        {
-          username: username,
-        }
-      );
-
-      const response0 = await axios.post(
-        `https://mike-token-backend-1.onrender.com/api/wallet/updateBalance/${username}`,
-        { balance: 200 }
-      );
-
-      const response1 = await axios.post(
-        `https://mike-token-backend-1.onrender.com/api/wallet/${referrerUsername}`
-      );
-      const response2 = await axios.post(
-        `https://mike-token-backend-1.onrender.com/api/wallet/updateBalance/${referrerUsername}`,
-        { balance: 200 + response1.data.balance }
-      );
-
-      console.log(response2.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-});
-
+// Handle POST request for joining Telegram group
 app.post("/joinTG", async (req, res) => {
   console.log("---request---", req.body["username"]);
-  const username = req.body["username"];
+  const username = req.body["username"] || '';
   console.log("--//---USER_NAME----//---", username);
   console.log("--//---USER_ID----//---", USER_ID);
-  
+
+  if (!username || USER_ID === undefined) {
+    return res.status(400).json({ message: "Invalid request data" });
+  }
+
   try {
     const member = await bot.telegram.getChatMember(groupId, USER_ID);
     if (member.status !== "left" && member.status !== "kicked") {
@@ -240,10 +203,15 @@ app.post("/joinTG", async (req, res) => {
   }
 });
 
+// Handle POST request for joining Telegram channel
 app.post("/joinTC", async (req, res) => {
   console.log("---request---", req.body["username"]);
-  const username = req.body["username"];
+  const username = req.body["username"] || '';
   console.log("--//---USER_ID----//---", USER_ID);
+
+  if (!username || USER_ID === undefined) {
+    return res.status(400).json({ message: "Invalid request data" });
+  }
 
   try {
     const member = await bot.telegram.getChatMember(channelID, USER_ID);
