@@ -14,10 +14,13 @@ const token = process.env.TELEGRAM_TOKEN;
 console.log("Bot token:", token); // Confirm token is loaded
 // Create a new Telegram bot using webhook instead of polling
 const bot = new TelegramBot(token);
-// Your webhook URL
-const webhookUrl = 'https://yourdomain.com/bot'; // Replace with your actual URL
+
+// Your Render URL
+const webhookUrl = 'https://pandaclickgamebot.onrender.com/bot';
+
 // Set up webhook
 bot.setWebHook(`${webhookUrl}?token=${token}`);
+
 // Assign telegram channel id
 const groupUsername = process.env.GROUP_USERNAME;
 const channelUsername = process.env.CHANNEL_USERNAME;
