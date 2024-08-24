@@ -1,8 +1,9 @@
-import { Telegraf, Markup, Context as TelegrafContext, CallbackQuery } from "telegraf";
-import express from 'express';
-import dotenv from 'dotenv';
-import axios from 'axios';
-import cors from 'cors';
+import { Telegraf } from "telegraf";
+import TelegramBot, { CallbackQuery } from "node-telegram-bot-api";
+import dotenv from "dotenv";
+import axios from "axios";
+import express from "express";
+import cors from "cors";
 
 // Load environment variables
 dotenv.config();
