@@ -1,4 +1,4 @@
-import { Telegraf, Markup, Context as TelegrafContext } from "telegraf";
+import { Telegraf, Markup, Context as TelegrafContext, CallbackQuery } from "telegraf";
 import express from 'express';
 import dotenv from 'dotenv';
 import axios from 'axios';
@@ -9,7 +9,6 @@ dotenv.config();
 
 const token = process.env.TELEGRAM_TOKEN;
 const url = process.env.WEBHOOK_URL; // Your Render URL
-console.log("Bot token:", token); // Confirm token is loaded
 
 // Check that token and URL are defined
 if (!token || !url) {
@@ -80,8 +79,6 @@ bot.command('start', (ctx) => {
   chatId = ctx.chat.id;
   const userID = ctx.from.id;
 
-  console.log("--//---myChatID----//---", chatId);
-
   const welcomeMessage =
     "Hello! Welcome to the Mike Mystery Bot 🐉 🐸 🐲\n\n" +
     "Start our tap-to-earn game by clicking the 'Play' button below. Choose your adventure and start tapping the screen to collect coins.\n\n" +
@@ -99,13 +96,9 @@ bot.on('message', async (ctx) => {
   const userID = ctx.from.id;
   USER_NAME = ctx.from?.username || "Unknown";
 
-  console.log("--//---myChatID----//---", chatId);
-  console.log("--//---myUserID----//---", userID);
-
   // Check if the message is from the specific group and the specific user
   if (ctx.chat.id === groupId && ctx.from.id === userID) {
-    console.log(`User ${ctx.from.username} (ID: ${ctx.from.id}) posted a message in the group.`);
-    // Here, you can do something with the message, like logging or sending a confirmation
+    // Process the message
     ctx.reply(`User ${ctx.from.username} posted a message in the group.`);
 
     try {
@@ -115,8 +108,6 @@ bot.on('message', async (ctx) => {
           username: ctx.from.username,
         }
       );
-
-      console.log("--//---OK!!!--vibe user--//---", ctx.from.username);
     } catch (error) {
       console.error(error);
     }
@@ -125,7 +116,7 @@ bot.on('message', async (ctx) => {
 
 // Handle callback queries from inline buttons
 bot.on('callback_query', (ctx) => {
-  const callbackQuery = ctx.callbackQuery;
+  const callbackQuery: CallbackQuery = ctx.callbackQuery;
   const category = callbackQuery.data;
 
   if (category === "earn") {
@@ -172,11 +163,7 @@ bot.on('callback_query', (ctx) => {
 
 // Handle POST request for joining Telegram group
 app.post("/joinTG", async (req, res) => {
-  console.log("---request---", req.body["username"]);
   const username = req.body["username"] || '';
-  console.log("--//---USER_NAME----//---", username);
-  console.log("--//---USER_ID----//---", USER_ID);
-
   if (!username || USER_ID === undefined) {
     return res.status(400).json({ message: "Invalid request data" });
   }
@@ -184,7 +171,6 @@ app.post("/joinTG", async (req, res) => {
   try {
     const member = await bot.telegram.getChatMember(groupId, USER_ID);
     if (member.status !== "left" && member.status !== "kicked") {
-      console.log("💪 You will gain 1000 coins!");
       await axios.post(
         `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add`,
         { username: username }
@@ -195,7 +181,7 @@ app.post("/joinTG", async (req, res) => {
       );
       res.status(200).json({ message: "ok", username: username });
     } else {
-      res.status(400).json({ message: "you are not in group now", username: username });
+      res.status(400).json({ message: "You are not in the group now", username: username });
     }
   } catch (error) {
     console.error("Error checking chat member:", error);
@@ -205,10 +191,7 @@ app.post("/joinTG", async (req, res) => {
 
 // Handle POST request for joining Telegram channel
 app.post("/joinTC", async (req, res) => {
-  console.log("---request---", req.body["username"]);
   const username = req.body["username"] || '';
-  console.log("--//---USER_ID----//---", USER_ID);
-
   if (!username || USER_ID === undefined) {
     return res.status(400).json({ message: "Invalid request data" });
   }
@@ -216,7 +199,6 @@ app.post("/joinTC", async (req, res) => {
   try {
     const member = await bot.telegram.getChatMember(channelID, USER_ID);
     if (member.status !== "left" && member.status !== "kicked") {
-      console.log("💪 You will gain 1000 coins!");
       await axios.post(
         `https://monster-tap-to-earn-game-backend-v2-1.onrender.com/api/earnings/add`,
         { username: username }
@@ -227,7 +209,7 @@ app.post("/joinTC", async (req, res) => {
       );
       res.status(200).json({ message: "ok", username: username });
     } else {
-      res.status(400).json({ message: "you are not in channel now", username: username });
+      res.status(400).json({ message: "You are not in the channel now", username: username });
     }
   } catch (error) {
     console.error("Error checking chat member:", error);
