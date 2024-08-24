@@ -6,15 +6,18 @@ const dotenv = require("dotenv");
 const axios = require("axios");
 const express = require("express");
 const cors = require("cors");
-// const http = require('http');
 // Create a new Express app
 // const app = express();
 // Load environment variables
 dotenv.config();
 const token = process.env.TELEGRAM_TOKEN;
 console.log("Bot token:", token); // Confirm token is loaded
-// Create a new Telegram bot using polling to fetch new updates
-const bot = new TelegramBot(token, { polling: true });
+// Create a new Telegram bot using webhook instead of polling
+const bot = new TelegramBot(token);
+// Your webhook URL
+const webhookUrl = 'https://yourdomain.com/bot'; // Replace with your actual URL
+// Set up webhook
+bot.setWebHook(`${webhookUrl}?token=${token}`);
 // Assign telegram channel id
 const groupUsername = process.env.GROUP_USERNAME;
 const channelUsername = process.env.CHANNEL_USERNAME;
@@ -188,6 +191,11 @@ bot.onText(/\/start (.+)/, async (msg, match) => {
 const app = express();
 app.use(cors());
 app.use(express.json());
+// Update the webhook route
+app.post('/bot', (req, res) => {
+    bot.processUpdate(req.body);
+    res.sendStatus(200);
+});
 app.post("/joinTG", (req, res) => {
     console.log("---request---", req.body["username"]);
     const username = req.body["username"];
