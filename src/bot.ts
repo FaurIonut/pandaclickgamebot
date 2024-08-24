@@ -111,49 +111,51 @@ bot.on('message', async (ctx: Context) => {
 
 // Handle callback queries from inline buttons
 bot.on('callback_query', async (ctx: Context) => {
-    const callbackData = ctx.callbackQuery?.data;
+    const callbackQuery = ctx.callbackQuery;
 
-    if (!callbackData) return; // Early return if data is undefined
+    if (callbackQuery && callbackQuery.data) {
+        const callbackData = callbackQuery.data;
 
-    if (callbackData === 'earn') {
-        const messagetext =
-            "How to play Monster Mystery Bot⚡️\n\n" +
-            "💰 Tap to Earn\n\n" +
-            "Tap the screen and collect coins. These coins will be exchanged to $MKT at the end of the event.\n\n" +
-            "⛏ Mine\n\n" +
-            "Upgrade your status by buying special NFTs that will give you higher passive income opportunities (coming soon).\n\n" +
-            "⏰ Profit Per Hour\n\n" +
-            "The bot itself as well as your status will work for you and mine more coins while you are away!\n\n" +
-            "Note: You need to log in to the game again once in a while.\n\n" +
-            "👥 Friends & Family\n\n" +
-            "Invite your friends and family and you will get bonuses. Help a friend move to the higher levels and you will get even more bonuses.\n\n" +
-            "⏳ Token Listings (top 10 exchanges only)\n\n" +
-            "At the end of the event, $MKT tokens will be airdropped and distributed among the players. MKT is already transferable and tradable. You can buy, sell or stake in our website to earn even more! You can buy Mike Token ($MKT) at the below exchanges right now:\n\n" +
-            "https://pancakeswap.finance/swap?outputCurrency=0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\n" +
-            "https://m.indoex.io/orderbookmobile/MKT_USDT\n\n" +
-            "📑 MKT Contract Address:\n\n" +
-            "0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\n" +
-            "The exact date of T1 & T2 Exchange listings will be announced in our announcement channel.\n\n" +
-            "Have fun and enjoy earning! 💰💰";
+        if (callbackData === 'earn') {
+            const messagetext =
+                "How to play Monster Mystery Bot⚡️\n\n" +
+                "💰 Tap to Earn\n\n" +
+                "Tap the screen and collect coins. These coins will be exchanged to $MKT at the end of the event.\n\n" +
+                "⛏ Mine\n\n" +
+                "Upgrade your status by buying special NFTs that will give you higher passive income opportunities (coming soon).\n\n" +
+                "⏰ Profit Per Hour\n\n" +
+                "The bot itself as well as your status will work for you and mine more coins while you are away!\n\n" +
+                "Note: You need to log in to the game again once in a while.\n\n" +
+                "👥 Friends & Family\n\n" +
+                "Invite your friends and family and you will get bonuses. Help a friend move to the higher levels and you will get even more bonuses.\n\n" +
+                "⏳ Token Listings (top 10 exchanges only)\n\n" +
+                "At the end of the event, $MKT tokens will be airdropped and distributed among the players. MKT is already transferable and tradable. You can buy, sell or stake in our website to earn even more! You can buy Mike Token ($MKT) at the below exchanges right now:\n\n" +
+                "https://pancakeswap.finance/swap?outputCurrency=0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\n" +
+                "https://m.indoex.io/orderbookmobile/MKT_USDT\n\n" +
+                "📑 MKT Contract Address:\n\n" +
+                "0xF542aC438CF8Cd4477A1fc7aB88ADDA5426d55Ed\n\n" +
+                "The exact date of T1 & T2 Exchange listings will be announced in our announcement channel.\n\n" +
+                "Have fun and enjoy earning! 💰💰";
 
-        await ctx.answerCbQuery();
-        await ctx.reply(messagetext, options3);
-    } else if (callbackData === 'task') {
-        const messagetext =
-            "😊 You will gain bonus! 🚀\n\n" +
-            "😎 Join Mike's telegram group\n" +
-            "https://t.me/MikeToken\n" +
-            "You will receive 1000 coins\n\n" +
-            "🤩 Join Mike's Ann Channel\n" +
-            "https://t.me/MikeTokenAnn\n" +
-            "You will receive 1000 coins\n\n" +
-            "😎 Follow Mike's Twitter\n" +
-            "https://twitter.com/MikeToken\n" +
-            "You will receive 1000 coins\n\n" +
-            "All tasks are verified by the bot. If you completed these tasks you will receive coins to your wallet. Please wait for a while and the bot will process your request. After you complete the tasks, your coins will be sent to your account!";
+            await ctx.answerCbQuery();
+            await ctx.reply(messagetext, options3);
+        } else if (callbackData === 'task') {
+            const messagetext =
+                "😊 You will gain bonus! 🚀\n\n" +
+                "😎 Join Mike's telegram group\n" +
+                "https://t.me/MikeToken\n" +
+                "You will receive 1000 coins\n\n" +
+                "🤩 Join Mike's Ann Channel\n" +
+                "https://t.me/MikeTokenAnn\n" +
+                "You will receive 1000 coins\n\n" +
+                "😎 Follow Mike's Twitter\n" +
+                "https://twitter.com/MikeToken\n" +
+                "You will receive 1000 coins\n\n" +
+                "All tasks are verified by the bot. If you completed these tasks you will receive coins to your wallet. Please wait for a while and the bot will process your request. After you complete the tasks, your coins will be sent to your account!";
 
-        await ctx.answerCbQuery();
-        await ctx.reply(messagetext, option1);
+            await ctx.answerCbQuery();
+            await ctx.reply(messagetext, option1);
+        }
     }
 });
 
@@ -223,4 +225,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
